@@ -1465,7 +1465,7 @@ class MPLPlot(object):
         return err
 
     def _get_errorbars(self, label=None, index=None, xerr=True, yerr=True):
-        from pandas import DataFrame
+        from pandas import DataFrame, Series
         errors = {}
 
         for kw, flag in zip(['xerr', 'yerr'], [xerr, yerr]):
@@ -1480,7 +1480,9 @@ class MPLPlot(object):
                 elif index is not None and err is not None:
                     err = err[index]
 
-                if err is not None:
+                if isinstance(err, (DataFrame, Series)):
+                    errors[kw] = err.as_matrix()
+                elif err is not None:
                     errors[kw] = err
         return errors
 

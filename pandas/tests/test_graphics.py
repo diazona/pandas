@@ -3369,6 +3369,33 @@ class TestDataFramePlots(TestPlotBase):
         self._check_has_errorbars(ax, xerr=0, yerr=1)
         _check_errorbar_color(ax.containers, 'green', has_err='has_yerr')
 
+    def test_errorbar_no_zero_in_index(self):
+        a = [1,2,3]
+        s = Series(a, index=a)
+        ax = _check_plot_works(s.plot, yerr=s)
+        self._check_has_errorbars(ax, xerr=0, yerr=1)
+        ax = _check_plot_works(s.plot, xerr=s)
+        self._check_has_errorbars(ax, xerr=1, yerr=0)
+        ax = _check_plot_works(s.plot, xerr=s, yerr=s)
+        self._check_has_errorbars(ax, xerr=1, yerr=1)
+
+        df = DataFrame(a, index=a)
+        ax = _check_plot_works(df.plot, yerr=df)
+        self._check_has_errorbars(ax, xerr=0, yerr=1)
+        ax = _check_plot_works(df.plot, xerr=df)
+        self._check_has_errorbars(ax, xerr=1, yerr=0)
+        ax = _check_plot_works(df.plot, xerr=df, yerr=df)
+        self._check_has_errorbars(ax, xerr=1, yerr=1)
+
+        a = np.array([[4,5,6], [7,8,9]])
+        df = DataFrame(a, index=[1,2], columns=['col1', 'col2', 'col3'])
+        ax = _check_plot_works(df.plot, yerr=df)
+        self._check_has_errorbars(ax, xerr=0, yerr=3)
+        ax = _check_plot_works(df.plot, xerr=df)
+        self._check_has_errorbars(ax, xerr=3, yerr=0)
+        ax = _check_plot_works(df.plot, xerr=df, yerr=df)
+        self._check_has_errorbars(ax, xerr=3, yerr=3)
+
     @slow
     def test_sharex_and_ax(self):
         # https://github.com/pydata/pandas/issues/9737
